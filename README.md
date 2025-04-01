@@ -31,6 +31,9 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### 3️⃣ Start Backend Locally
 Run the following commands in your terminal:
 ```sh
+#Install deps
+npm install
+
 # Login to Supabase (only needed once)
 supabase login
 
