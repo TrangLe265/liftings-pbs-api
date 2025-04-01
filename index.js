@@ -10,6 +10,7 @@ app.use(express.json());
 // Middleware to receive and check JWT
 // User login via app, retrieve the token -> use token to access API
 const authenticateUser = async (req, res, next) => {
+    console.log("siging in... ")
     const token = req.headers.authorization?.split(" ")[1]; // Extract the header from the token
     if (!token) return res.status(401).json({ error: "Invalid token, check authorization" });
 
@@ -39,16 +40,18 @@ app.get("/categories", async (req, res) => {
     res.json(data);
 });
 
-// To get lift_category by ID
-app.get("/categories/:lift_category_id", async (req, res) => {
+
+// To get lift_category by name
+app.get("/categories/:lift_category_name", async (req, res) => {
     const { data, error } = await supabase
         .from('lift_category')
         .select()
-        .eq('id', req.params.lift_category_id);
+        .eq('name', req.params.lift_category_name);
 
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
 });
+
 
 //_________________________________________________
 // LIFTS ENDPOINTS - USER CAN ONLY SEE THEIR OWN
@@ -77,16 +80,21 @@ app.get('/lifts/:lift_category_id', authenticateUser, async (req, res) => {
 
 // To add a new lift
 app.post('/lifts', authenticateUser, async (req, res) => {
+    console.log("checking connection")
     const { lift_category_id, date, weight_lifted } = req.body;
-    if (!lift_category_id || !date || !weight_lifted) {
-        return res.status(400).json({ error: "All fields are required!" });
+    console.log(req.user)
+    // Convert weight_lifted to a proper number if it's a string
+    const weightParsed = parseFloat(weight_lifted);
+
+    if (!lift_category_id || !date || isNaN(weightParsed)) {
+        return res.status(400).json({ error: "All fields are required and weight_lifted must be a number!" });
     }
 
     const { data, error } = await supabase
         .from('lifts')
         .insert([
             { user_id: req.user.id, lift_category_id, date, weight_lifted },
-        ]);
+        ]); 
 
     if (error) return res.status(500).json({ error: error.message });
     res.status(201).json(data); // If created successfully, send back the newly created data
