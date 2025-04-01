@@ -69,10 +69,19 @@ app.get("/lifts", authenticateUser, async (req, res) => {
 
 // To get all lifts in a category
 app.get('/lifts/:lift_category_id', authenticateUser, async (req, res) => {
+    console.log('hello from the server side');
+    
+    // Ensure the authenticated user's ID is available
+    const userId = req.user?.id;
+    if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const { data, error } = await supabase
         .from('lifts')
         .select()
-        .is('lift_category_id', req.params.lift_category_id);
+        .eq('lift_category_id', req.params.lift_category_id)
+        .eq('user_id', userId); // Filter by the authenticated user's ID
 
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
