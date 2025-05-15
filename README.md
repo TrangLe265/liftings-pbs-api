@@ -52,7 +52,5 @@ nodemon start  # Runs with Nodemon
 - `PUT /lifts/id` - Edit a specific lift
 - `DELETE /lifts/id` - Delete a specific lift
 - `GET /categories` - Fetch all lift categories
----
 
-🚀 Happy Coding!
 
